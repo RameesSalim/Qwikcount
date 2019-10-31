@@ -1,7 +1,18 @@
 import requests
 from bs4 import BeautifulSoup
 import html5lib
+import sys
 
+_cache = {}
+
+def _read(url):
+	text = _cache.get(url)
+	if text is None:
+		text = requests.get(url).text
+		if not text:
+			raise Exception('Empty response. Check connectivity.')
+		_cache[url] = text
+	return text
 
 def qwikcount(url):
 	r = requests.get(url)
@@ -15,14 +26,25 @@ def qwikcount(url):
 		count = count+1
 	return count
 
+if sys.version_info[0] ==2:
+	input = raw_input
 
-url = "https://www.qwiklabs.com/public_profiles/f50eb710-cd80-4728-9f53-f1ffee77f4d3"
-print("Number of Quest completed : ",qwikcount(url))
+input_file = input('Enter input file name: ')
+# input_file = 'file.csv'
+output_file = input('Enter output file name (Default output.csv): ')
 
+if not output_file.replace(' ', ''):
+	output_file = 'output.csv'
 
-
-	# for tag in divTag:
-	# 	print(tag)
-	# 	tdTags = tag.find_all("div", {'class': 'public-profile__badge'})
-	# 	count = count+1
-	# print(count)
+with open(input_file, 'r') as fin:
+	with open(output_file, 'w') as fout:
+		line0=fin.readline()
+		for line in fin:
+			print(line)
+			print('Fetching contributions: ')
+			try:
+				count = str(qwikcount(line[0]))
+			except Exception as e:
+				print('Failedaaa: ' )
+				print(e)
+			fout.write(line[:-1] + ',' + count + '\n')
