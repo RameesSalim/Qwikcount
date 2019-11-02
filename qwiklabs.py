@@ -28,7 +28,7 @@ def qwikcount(url):
 	classes = []
 	children = divTag.find_all("div",recursive = False)
 	nameTag = soup.find("h1", {'class': 'l-mbm'}, text=True)
-	value = nameTag.text
+	value = nameTag.text.lstrip("\n").rstrip("\n")
 	for child in children:
 		count = count+1
 	return count,value
@@ -68,9 +68,9 @@ with open(input_file, 'r') as fin:
 					print(e)
 					value =""
 					count = 'N/A'
-					statuss= "Incomplete"
+					statuss= "Error"
 					failed.append(name)
-				fout.write( name + ',' + value + ',' + url+ ',' + str(count) + ',' + statuss + '\n')
+				fout.write( name + ',' + str(value) + ',' + url+ ',' + str(count) + ',' + statuss + '\n')
 					
 print("Export Complete")
 
